@@ -2,14 +2,15 @@ package wrld.team1.com.world3dworkpresence;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.eegeo.mapapi.EegeoApi;
 import com.eegeo.mapapi.EegeoMap;
 import com.eegeo.mapapi.MapView;
-import com.eegeo.mapapi.buildings.BuildingHighlight;
-import com.eegeo.mapapi.buildings.BuildingHighlightOptions;
-import com.eegeo.mapapi.buildings.BuildingsApi;
+import com.eegeo.mapapi.camera.CameraAnimationOptions;
 import com.eegeo.mapapi.camera.CameraPosition;
 import com.eegeo.mapapi.camera.CameraUpdateFactory;
 import com.eegeo.mapapi.geometry.LatLngAlt;
@@ -18,8 +19,12 @@ import com.eegeo.mapapi.map.OnMapReadyCallback;
 import com.eegeo.mapapi.markers.Marker;
 import com.eegeo.mapapi.markers.MarkerOptions;
 
-public class MapsActivity extends AppCompatActivity {
+public class MapsActivity extends AppCompatActivity implements View.OnClickListener {
     private MapView mapView = null;
+    private EegeoMap map = null;
+
+    private Button up = null;
+    private Button down = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +51,26 @@ public class MapsActivity extends AppCompatActivity {
                                 .zoom(19)
                                 .bearing(270)
                                 .build();
-                        eegeoMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+                        CameraAnimationOptions animOptions = new CameraAnimationOptions.Builder().build();
+                        eegeoMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), animOptions);
                     }
                 });
+                map = eegeoMap;
 
                 Toast.makeText(MapsActivity.this, "Welcome to Westport House workspace.", Toast.LENGTH_LONG).show();
             }
         });
+
+        setupButtons();
+    }
+
+    private void setupButtons()
+    {
+        up = this.findViewById(R.id.button_up);
+        down = this.findViewById(R.id.button_down);
+
+        up.setOnClickListener(this);
+        down.setOnClickListener(this);
     }
 
     @Override
@@ -76,6 +94,19 @@ public class MapsActivity extends AppCompatActivity {
         mapView.onDestroy();
     }
 
+    @Override
+    public void onClick(View button)
+    {
+        Log.d("onClick called", "OnClick called");
+        if(button.getId() == R.id.button_down)
+        {
+            map.moveIndoorDown();
+        }
+        else if(button.getId() == R.id.button_up)
+        {
+            map.moveIndoorUp();
+        }
+    }
 
     public class OnMapClickedHandler implements EegeoMap.OnMapClickListener
     {
@@ -105,6 +136,5 @@ public class MapsActivity extends AppCompatActivity {
             marker = map.addMarker(mOptions);
             Toast.makeText(MapsActivity.this, String.format("Lat: %f  ,  Lng: %f  , Alt: %f m", point.latitude, point.longitude, point.altitude), Toast.LENGTH_LONG).show();
         }
-
     }
 }
