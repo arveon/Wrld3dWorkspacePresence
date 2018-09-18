@@ -7,7 +7,10 @@ import android.widget.Toast;
 import com.eegeo.mapapi.EegeoApi;
 import com.eegeo.mapapi.EegeoMap;
 import com.eegeo.mapapi.MapView;
+import com.eegeo.mapapi.geometry.LatLngAlt;
 import com.eegeo.mapapi.map.OnMapReadyCallback;
+import com.eegeo.mapapi.markers.Marker;
+import com.eegeo.mapapi.markers.MarkerOptions;
 
 public class MapsActivity extends AppCompatActivity {
     private MapView mapView = null;
@@ -23,8 +26,9 @@ public class MapsActivity extends AppCompatActivity {
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new OnMapReadyCallback(){
             @Override
-            public void onMapReady(final EegeoMap map){
-                Toast.makeText(MapsActivity.this, "Welcome to Eegeo Maps", Toast.LENGTH_LONG).show();
+            public void onMapReady(final EegeoMap eegeoMap)
+            {
+                eegeoMap.addOnMapClickListener(new OnMapClickedHandler(eegeoMap));
             }
         });
     }
@@ -48,5 +52,37 @@ public class MapsActivity extends AppCompatActivity {
     {
         super.onDestroy();
         mapView.onDestroy();
+    }
+
+
+    public class OnMapClickedHandler implements EegeoMap.OnMapClickListener
+    {
+        private EegeoMap map = null;
+        private Marker marker = null;
+
+        OnMapClickedHandler(EegeoMap eegeoMap)
+        {
+            this.map = eegeoMap;
+        }
+
+        @Override
+        public void onMapClick(LatLngAlt point)
+        {
+            if(marker != null)
+            {
+                map.removeMarker(marker);
+                marker = null;
+            }
+            MarkerOptions mOptions = new MarkerOptions().position(point.toLatLng()).labelText("Selected");
+
+            if(map.getActiveIndoorMap() != null)
+            {
+                mOptions.indoor(map.getActiveIndoorMap().id, map.getCurrentFloorIndex());
+            }
+
+            marker = map.addMarker(mOptions);
+            Toast.makeText(MapsActivity.this, String.format("Lat: %f  ,  Lng: %f  , Alt: %f m", point.latitude, point.longitude, point.altitude), Toast.LENGTH_LONG).show();
+        }
+
     }
 }
