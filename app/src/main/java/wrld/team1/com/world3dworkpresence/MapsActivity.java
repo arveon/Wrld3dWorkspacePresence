@@ -7,7 +7,13 @@ import android.widget.Toast;
 import com.eegeo.mapapi.EegeoApi;
 import com.eegeo.mapapi.EegeoMap;
 import com.eegeo.mapapi.MapView;
+import com.eegeo.mapapi.buildings.BuildingHighlight;
+import com.eegeo.mapapi.buildings.BuildingHighlightOptions;
+import com.eegeo.mapapi.buildings.BuildingsApi;
+import com.eegeo.mapapi.camera.CameraPosition;
+import com.eegeo.mapapi.camera.CameraUpdateFactory;
 import com.eegeo.mapapi.geometry.LatLngAlt;
+import com.eegeo.mapapi.map.OnInitialStreamingCompleteListener;
 import com.eegeo.mapapi.map.OnMapReadyCallback;
 import com.eegeo.mapapi.markers.Marker;
 import com.eegeo.mapapi.markers.MarkerOptions;
@@ -29,6 +35,22 @@ public class MapsActivity extends AppCompatActivity {
             public void onMapReady(final EegeoMap eegeoMap)
             {
                 eegeoMap.addOnMapClickListener(new OnMapClickedHandler(eegeoMap));
+                eegeoMap.addInitialStreamingCompleteListener(new OnInitialStreamingCompleteListener()
+                {
+                    @Override
+                    public void onInitialStreamingComplete()
+                    {
+                        CameraPosition position = new CameraPosition.Builder()
+                                .target(56.460083, -2.978135)
+                                .indoor("westport_house", 2)
+                                .zoom(19)
+                                .bearing(270)
+                                .build();
+                        eegeoMap.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+                    }
+                });
+
+                Toast.makeText(MapsActivity.this, "Welcome to Westport House workspace.", Toast.LENGTH_LONG).show();
             }
         });
     }

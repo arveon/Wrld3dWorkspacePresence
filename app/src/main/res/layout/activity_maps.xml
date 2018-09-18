@@ -13,6 +13,7 @@
         android:layout_height="fill_parent"
         eegeo:camera_target_latitude="56.459039"
         eegeo:camera_target_longitude="-2.9774633"
-        eegeo:camera_zoom="16"/>
+        eegeo:camera_zoom="16"
+        />
 
 </android.support.constraint.ConstraintLayout>
